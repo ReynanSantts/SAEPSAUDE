@@ -1,8 +1,6 @@
 <?php
-// /Model/Connection.php
 namespace Model;
 
-// Usamos a classe PDO nativa do PHP.
 use PDO;
 use PDOException;
 

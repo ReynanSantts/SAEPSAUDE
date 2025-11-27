@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const formattedDate = `${activityDate.getHours().toString().padStart(2, '0')}:${activityDate.getMinutes().toString().padStart(2, '0')} - ${activityDate.getDate().toString().padStart(2, '0')}/${(activityDate.getMonth() + 1).toString().padStart(2, '0')}/${activityDate.getFullYear()}`;
             
             const activityCard = `
-            <div class="activity-card">
+            <div class="activity-card" data-activity-id="${activity.id}">
                 <img src="${BASE_URL}/Images/Imagens-perfil/${activity.usuario_imagem}" alt="Avatar" class="user-avatar">
                 
                 <div class="activity-header">
@@ -48,8 +48,14 @@ Calorias</span>
                 </div>
 
                 <div class="activity-actions">
-                    <button class="action-btn"><img src="${BASE_URL}/Images/Icones/coracao.svg" alt="Curtir"> ${Math.floor(Math.random() * 20)}</button>
-                    <button class="action-btn"><img src="${BASE_URL}/Images/Icones/comentario.svg" alt="Comentar"> ${Math.floor(Math.random() * 10)}</button>
+                    <button class="action-btn like-btn">
+                        <img src="${BASE_URL}/Images/Icones/coracao.svg" alt="Curtir"> 
+                        <span class="like-count">${activity.like_count}</span>
+                    </button>
+                    <button class="action-btn comment-btn">
+                        <img src="${BASE_URL}/Images/Icones/comentario.svg" alt="Comentar"> 
+                        <span class="comment-count">${activity.comment_count}</span>
+                    </button>
                 </div>
             </div>
             `;
@@ -71,8 +77,13 @@ Calorias</span>
     }
 
     function fetchAndRenderActivities(type, page) {
-        fetch(`${BASE_URL}/index.php?action=filterActivities&type=${type}&page=${page}`)
-            .then(response => response.json())
+        fetch(`${BASE_URL}/index.php?controller=activity&action=filter&type=${type}&page=${page}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.error) {
                     throw new Error(data.error);
@@ -99,9 +110,9 @@ Calorias</span>
     });
 
     paginationContainer.addEventListener('click', function(e) {
-        e.preventDefault();
         const link = e.target.closest('.page-link');
         if (link && !link.classList.contains('disabled') && !link.classList.contains('active')) {
+            e.preventDefault();
             const page = parseInt(link.dataset.page, 10);
             fetchAndRenderActivities(currentType, page);
         }

@@ -1,7 +1,9 @@
 <aside class="sidebar">
     <?php if (isset($_SESSION['user_id'])): ?>
+        
         <div class="profile-info">
             <?php
+            $userStats = $userStats ?? ['total_atividades' => 0, 'total_calorias' => 0];
             $userAvatarPath = BASE_URL . '/Images/Imagens-perfil/' . htmlspecialchars($_SESSION['user_avatar']);
             ?>
             <img src="<?php echo $userAvatarPath; ?>" alt="Avatar do Usuário" class="profile-avatar">
@@ -9,19 +11,20 @@
             <h3><?php echo htmlspecialchars($_SESSION['user_name']); ?></h3>
             <div class="stats">
                 <div class="stat-item">
-                    <span class="stat-value"><?php echo $userStats['total_atividades'] ?? 0; ?></span>
+                    <span class="stat-value"><?php echo $userStats['total_atividades']; ?></span>
                     <span>Qtd. Atividades</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-value"><?php echo $userStats['total_calorias'] ?? 0; ?></span>
+                    <span class="stat-value"><?php echo $userStats['total_calorias']; ?></span>
                     <span>Qtd. Calorias</span>
                 </div>
             </div>
         </div>
 
-        <a href="<?php echo BASE_URL; ?>/index.php?action=showCreateActivityPage" class="btn-create-activity">Criar Atividade</a>
+        <a href="<?php echo BASE_URL; ?>/index.php?controller=activity&action=showCreatePage" class="btn-create-activity">Criar Atividade</a>
 
     <?php else: ?>
+        
         <div class="profile-info">
             <img src="<?php echo BASE_URL; ?>/Images/Logo/SAEPSaude.png" alt="Logo SAEP Saúde" class="profile-avatar">
             <h3>SAEPSaúde</h3>

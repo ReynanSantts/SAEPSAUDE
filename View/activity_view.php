@@ -1,54 +1,78 @@
-<?php // View/activity_view.php ?>
-<header class="main-header">
-    <h1>Crie sua atividade</h1>
-    <a href="/index.php?action=logout" class="btn-logout">Logout</a>
-</header>
+<div class="activity-page-container">
 
-<div class="form-container">
-    <form action="/index.php?action=createActivity" method="POST">
-        <div class="form-row">
-            <div class="form-group">
-                <label for="tipo">Tipo da atividade</label>
-                <input type="text" id="tipo" name="tipo" placeholder="Ex: Caminhada" required>
-            </div>
-            <div class="form-group">
-                <label for="distancia">Distância percorrida</label>
-                <input type="text" id="distancia" name="distancia" placeholder="Ex: 1000 metros" required>
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group">
-                <label for="duracao">Duração da atividade</label>
-                <input type="text" id="duracao" name="duracao" placeholder="Ex: 120 min" required>
-            </div>
-            <div class="form-group">
-                <label for="calorias">Quantidade de Calorias</label>
-                <input type="number" id="calorias" name="calorias" placeholder="Ex: 300" required>
-            </div>
-        </div>
-        <button type="submit" class="btn-create-activity">Criar Atividade</button>
-    </form>
-</div>
+    <header class="main-header">
+        <h1>Registrar Nova Atividade</h1>
+        <a href="<?php echo BASE_URL; ?>/index.php" class="btn-back">Voltar</a>
+    </header>
 
-<div class="user-activities">
-    <h2>Suas Atividades</h2>
-    <div class="activity-card">
-        <div class="activity-header">
-            <img src="/Images/Imagens-perfil/usuario03.jpg" alt="Avatar" class="user-avatar">
-            <div class="user-info">
-                <strong>Usuário_03</strong>
-                <span class="activity-type">Caminhada</span>
+    <div class="form-container">
+        
+        <?php if (isset($_GET['error'])): ?>
+            <p class="form-message error"><?php echo htmlspecialchars($_GET['error']); ?></p>
+        <?php endif; ?>
+        <?php if (isset($_GET['success'])): ?>
+            <p class="form-message success">Atividade registrada com sucesso!</p>
+        <?php endif; ?>
+
+        <form action="<?php echo BASE_URL; ?>/index.php?controller=activity&action=create" method="POST">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="tipo_atividade">Tipo da atividade</label>
+                    <select id="tipo_atividade" name="tipo_atividade" required>
+                        <option value="" disabled selected>Selecione o tipo</option>
+                        <option value="corrida">Corrida</option>
+                        <option value="caminhada">Caminhada</option>
+                        <option value="trilha">Trilha</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="distancia">Distância (em metros)</label>
+                    <input type="number" id="distancia" name="distancia" placeholder="Ex: 5000" required>
+                </div>
             </div>
-            <span class="activity-time">05:30 - 09/07/2024</span>
-        </div>
-        <div class="activity-stats">
-            <span><strong>5 km</strong> Distância</span>
-            <span><strong>50 min</strong> Duração</span>
-            <span><strong>350</strong> Calorias</span>
-        </div>
-        <div class="activity-actions">
-            <button class="action-btn"><img src="/Images/Icones/coracao.svg" alt="Curtir"> 5</button>
-            <button class="action-btn"><img src="/Images/Icones/comentario.svg" alt="Comentar"> 4</button>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="duracao">Duração (em minutos)</label>
+                    <input type="number" id="duracao" name="duracao" placeholder="Ex: 30" required>
+                </div>
+                <div class="form-group">
+                    <label for="calorias">Calorias Queimadas</label>
+                    <input type="number" id="calorias" name="calorias" placeholder="Ex: 350" required>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">Registrar Atividade</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="user-activities-container">
+        <h2>Suas Atividades Recentes</h2>
+        <div class="activity-feed-local">
+            <?php if (empty($userActivities)): ?>
+                <p>Você ainda não registrou nenhuma atividade.</p>
+            <?php else: ?>
+                <?php foreach ($userActivities as $activity): ?>
+                    <div class="activity-card">
+                        <img src="<?php echo BASE_URL . '/Images/Imagens-perfil/' . htmlspecialchars($_SESSION['user_avatar']); ?>" alt="Avatar" class="user-avatar">
+                        <div class="activity-content">
+                            <div class="activity-header">
+                                <div class="user-info">
+                                    <strong><?php echo htmlspecialchars($_SESSION['user_name']); ?></strong>
+                                    <span class="activity-type"><?php echo htmlspecialchars(ucfirst($activity['tipo_atividade'])); ?></span>
+                                </div>
+                                <span class="activity-time"><?php echo date('H:i - d/m/Y', strtotime($activity['createdAt'])); ?></span>
+                            </div>
+                            <div class="activity-stats">
+                                <span><strong><?php echo number_format($activity['distancia_percorrida'] / 1000, 1, ',', '.'); ?></strong> km</span>
+                                <span><strong><?php echo $activity['duracao_atividade']; ?></strong> min</span>
+                                <span><strong><?php echo $activity['quantidade_calorias']; ?></strong> Calorias</span>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
     </div>
+
 </div>

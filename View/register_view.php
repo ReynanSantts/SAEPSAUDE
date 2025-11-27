@@ -6,7 +6,7 @@
         <p class="error-message"><?php echo htmlspecialchars($_GET['error']); ?></p>
     <?php endif; ?>
 
-    <form class="register-form" method="POST" action="<?php echo BASE_URL; ?>/index.php?action=registerUser">
+    <form class="register-form" method="POST" action="<?php echo BASE_URL; ?>/index.php?action=registerUser" enctype="multipart/form-data">
         <div class="form-group">
             <label for="nome">Nome Completo</label>
             <input type="text" id="nome" name="nome" required>
@@ -22,6 +22,10 @@
         <div class="form-group">
             <label for="senha">Senha</label>
             <input type="password" id="senha" name="senha" required>
+        </div>
+        <div class="form-group">
+            <label for="imagem">Foto de Perfil (Opcional)</label>
+            <input type="file" id="imagem" name="imagem" accept="image/png, image/jpeg, image/gif">
         </div>
         <div class="form-buttons">
             <button type="submit" class="btn-register">Cadastrar</button>

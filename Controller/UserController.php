@@ -15,23 +15,12 @@ class UserController {
 
     public function showHome() {
         $activityModel = new ActivityModel($this->db);
-        
-        $page = 1;
-        $limit = 4;
-        $type = 'corrida';
-
-        $atividades = $activityModel->getActivitiesByType($type, $page, $limit);
-        $totalActivities = $activityModel->countActivitiesByType($type);
-        $totalPages = ceil($totalActivities / $limit);
-
         $userStats = ['total_atividades' => 0, 'total_calorias' => 0];
         if (isset($_SESSION['user_id'])) {
             $userStats = $activityModel->getUserStats($_SESSION['user_id']);
         }
-        
         $title = "SAEP Saúde - Feed";
         $view_file = 'home_view.php';
-        
         require_once dirname(__DIR__) . '/View/template.php';
     }
 
@@ -98,60 +87,41 @@ class UserController {
                 exit;
             }
 
+            $nome_imagem = 'default.png';
+            if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] === UPLOAD_ERR_OK) {
+                $uploadDir = dirname(__DIR__) . '/Images/Imagens-perfil/';
+                $fileTmpPath = $_FILES['imagem']['tmp_name'];
+                $fileName = $_FILES['imagem']['name'];
+                $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+                
+                $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
+                $dest_path = $uploadDir . $newFileName;
+
+                $allowedfileExtensions = ['jpg', 'gif', 'png', 'jpeg'];
+                if (in_array($fileExtension, $allowedfileExtensions)) {
+                    if (move_uploaded_file($fileTmpPath, $dest_path)) {
+                        $nome_imagem = $newFileName;
+                    } else {
+                        header('Location: ' . BASE_URL . '/index.php?action=showRegisterPage&error=Erro ao mover o arquivo de imagem.');
+                        exit;
+                    }
+                } else {
+                    header('Location: ' . BASE_URL . '/index.php?action=showRegisterPage&error=Tipo de arquivo inválido.');
+                    exit;
+                }
+            }
+
             $senha_hash = password_hash($senha_pura, PASSWORD_DEFAULT);
 
-            if ($userModel->createUser($nome, $email, $nome_usuario, $senha_hash)) {
+            if ($userModel->createUser($nome, $email, $nome_usuario, $senha_hash, $nome_imagem)) {
                 header('Location: ' . BASE_URL . '/index.php?success=registered');
                 exit;
             } else {
-                header('Location: ' . BASE_URL . '/index.php?action=showRegisterPage&error=Ocorreu um erro ao criar sua conta. Tente novamente.');
+                header('Location: ' . BASE_URL . '/index.php?action=showRegisterPage&error=Ocorreu um erro ao criar sua conta.');
                 exit;
             }
         }
         header('Location: ' . BASE_URL . '/index.php?action=showRegisterPage');
-        exit;
-    }
-
-    public function showActivityPage() {
-        if (!isset($_SESSION['user_id'])) {
-            header('Location: ' . BASE_URL . '/index.php');
-            exit;
-        }
-        $title = "SAEP Saúde - Minhas Atividades";
-        $view_file = 'activity_view.php';
-        require_once dirname(__DIR__) . '/View/template.php';
-    }
-
-    public function createActivity() {
-        header('Location: ' . BASE_URL . '/index.php?action=showActivityPage');
-        exit;
-    }
-
-    public function filterActivities() {
-        header('Content-Type: application/json');
-        
-        $type = $_GET['type'] ?? 'corrida';
-        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        $limit = 4;
-
-        if (!in_array($type, ['corrida', 'caminhada', 'trilha'])) {
-            echo json_encode(['error' => 'Tipo de atividade inválido.']);
-            exit;
-        }
-
-        $activityModel = new \Model\ActivityModel($this->db);
-        
-        $atividades = $activityModel->getActivitiesByType($type, $page, $limit);
-        $totalActivities = $activityModel->countActivitiesByType($type);
-        $totalPages = ceil($totalActivities / $limit);
-
-        echo json_encode([
-            'activities' => $atividades,
-            'pagination' => [
-                'currentPage' => $page,
-                'totalPages' => $totalPages
-            ]
-        ]);
         exit;
     }
 }

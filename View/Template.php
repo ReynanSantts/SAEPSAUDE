@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $title ?? 'SAEP Saúde'; ?></title>
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/Templates/Assets/CSS/Style.css">
 </head>
+
 <body>
     <div id="base-url-data" data-url="<?php echo BASE_URL; ?>" style="display: none;"></div>
     <div class="app-container">
-        
+
         <?php require_once __DIR__ . '/sidebar.php'; ?>
 
         <main class="main-content">
@@ -43,12 +45,16 @@
                         <button type="button" class="btn-cancel" id="cancel-login-popup">Cancelar</button>
                     </div>
                 </form>
-                <p class="register-link">Não tem uma conta? <a href="<?php echo BASE_URL; ?>/index.php?action=showRegisterPage">Cadastre-se</a></p>
+                <p class="register-link">Não tem uma conta? <a
+                        href="<?php echo BASE_URL; ?>/index.php?action=showRegisterPage">Cadastre-se</a></p>
             </div>
         </div>
     </div>
 
     <script src="<?php echo BASE_URL; ?>/Templates/Assets/JS/popup.js"></script>
     <script src="<?php echo BASE_URL; ?>/Templates/Assets/JS/feed.js"></script>
+    <script src="<?php echo BASE_URL; ?>/Templates/Assets/JS/like.js"></script>
+    <script src="<?php echo BASE_URL; ?>/Templates/Assets/JS/comment.js"></script>
 </body>
+
 </html>
