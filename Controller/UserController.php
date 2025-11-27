@@ -38,17 +38,17 @@ class UserController {
     public function login() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = $_POST['email'] ?? '';
-            $senha = $_POST['senha'] ?? '';
+            $senha_digitada = $_POST['senha'] ?? '';
 
-            if (empty($email) || empty($senha)) {
-                header('Location: ' . BASE_URL . '/index.php');
+            if (empty($email) || empty($senha_digitada)) {
+                header('Location: ' . BASE_URL . '/index.php?error=login_failed');
                 exit;
             }
 
             $userModel = new UserModel($this->db);
             $user = $userModel->findUserByEmail($email);
 
-            if ($user && $senha === $user['senha']) {
+            if ($user && password_verify($senha_digitada, $user['senha'])) {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_name'] = $user['nome_usuario'];
                 $_SESSION['user_avatar'] = $user['imagem'];
@@ -65,7 +65,9 @@ class UserController {
     }
 
     public function logout() {
-        session_start();
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
         session_destroy();
         header('Location: ' . BASE_URL . '/index.php');
         exit;
@@ -82,9 +84,9 @@ class UserController {
             $nome = $_POST['nome'] ?? '';
             $email = $_POST['email'] ?? '';
             $nome_usuario = $_POST['nome_usuario'] ?? '';
-            $senha = $_POST['senha'] ?? '';
+            $senha_pura = $_POST['senha'] ?? '';
 
-            if (empty($nome) || empty($email) || empty($nome_usuario) || empty($senha)) {
+            if (empty($nome) || empty($email) || empty($nome_usuario) || empty($senha_pura)) {
                 header('Location: ' . BASE_URL . '/index.php?action=showRegisterPage&error=Todos os campos são obrigatórios.');
                 exit;
             }
@@ -96,7 +98,9 @@ class UserController {
                 exit;
             }
 
-            if ($userModel->createUser($nome, $email, $nome_usuario, $senha)) {
+            $senha_hash = password_hash($senha_pura, PASSWORD_DEFAULT);
+
+            if ($userModel->createUser($nome, $email, $nome_usuario, $senha_hash)) {
                 header('Location: ' . BASE_URL . '/index.php?success=registered');
                 exit;
             } else {
@@ -110,7 +114,7 @@ class UserController {
 
     public function showActivityPage() {
         if (!isset($_SESSION['user_id'])) {
-            header('Location: /index.php');
+            header('Location: ' . BASE_URL . '/index.php');
             exit;
         }
         $title = "SAEP Saúde - Minhas Atividades";
@@ -119,7 +123,7 @@ class UserController {
     }
 
     public function createActivity() {
-        header('Location: /index.php?action=showActivityPage');
+        header('Location: ' . BASE_URL . '/index.php?action=showActivityPage');
         exit;
     }
 
